@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"bookstore/internal/app/logger"
-	"garyburd/redigo/redis"
+	"github.com/garyburd/redigo/redis"
 )
 
 const (
