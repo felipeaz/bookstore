@@ -2,6 +2,7 @@ package module
 
 import (
 	"bookstore/internal/app/constants/errors"
+	"bookstore/internal/app/database"
 	"bookstore/internal/app/domain/orders/items/model"
 	"bookstore/internal/app/domain/orders/items/repository/interface"
 	"bookstore/internal/app/logger"
@@ -9,12 +10,14 @@ import (
 
 type ItemModule struct {
 	Repository _interface.ItemRepositoryInterface
+	Cache      database.CacheInterface
 	Log        logger.LogInterface
 }
 
-func NewItemModule(repo _interface.ItemRepositoryInterface, log logger.LogInterface) ItemModule {
+func NewItemModule(repo _interface.ItemRepositoryInterface, cache database.CacheInterface, log logger.LogInterface) ItemModule {
 	return ItemModule{
 		Repository: repo,
+		Cache:      cache,
 		Log:        log,
 	}
 }

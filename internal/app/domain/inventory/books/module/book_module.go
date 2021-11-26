@@ -2,6 +2,7 @@ package module
 
 import (
 	"bookstore/internal/app/constants/errors"
+	"bookstore/internal/app/database"
 	"bookstore/internal/app/domain/inventory/books/model"
 	"bookstore/internal/app/domain/inventory/books/repository/interface"
 	"bookstore/internal/app/logger"
@@ -10,14 +11,17 @@ import (
 // BookModule process the request received from handler.
 type BookModule struct {
 	Repository _interface.BookRepositoryInterface
+	Cache      database.CacheInterface
 	Log        logger.LogInterface
 }
 
 func NewBookModule(
 	repo _interface.BookRepositoryInterface,
+	cache database.CacheInterface,
 	log logger.LogInterface) BookModule {
 	return BookModule{
 		Repository: repo,
+		Cache:      cache,
 		Log:        log,
 	}
 }

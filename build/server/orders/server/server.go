@@ -10,9 +10,9 @@ import (
 )
 
 // Start initialize the webservice,
-func Start(dbService database.GORMServiceInterface, log logger.LogInterface) (err error) {
+func Start(dbService database.GORMServiceInterface, cache database.CacheInterface, log logger.LogInterface) (err error) {
 	cRepository := repository.NewItemRepository(dbService)
-	cModule := module.NewItemModule(cRepository, log)
+	cModule := module.NewItemModule(cRepository, cache, log)
 	cHandler := handler.NewItemHandler(cModule)
 
 	return router.Build(cHandler)

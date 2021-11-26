@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bookstore/infra/redis"
 	"log"
 	"os"
 
@@ -30,7 +31,17 @@ func main() {
 	logger := _log.NewLogger(os.Getenv("LOG_FILE"), ServiceName)
 	dbService := service.NewMySQLService(db, logger)
 
-	err = server.Start(dbService, logger)
+	cache, err := redis.NewCache(
+		os.Getenv("REDIS_HOST"),
+		os.Getenv("REDIS_PORT"),
+		os.Getenv("REDIS_EXPIRE"),
+		logger,
+	)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	err = server.Start(dbService, cache, logger)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
