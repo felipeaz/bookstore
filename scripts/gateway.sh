@@ -35,7 +35,7 @@ curl --location --request POST 'http://localhost:8001/services/account-service/r
 curl --location --request POST 'http://localhost:8001/services/inventory-service/routes' \
 --header 'Content-Type: application/x-www-form-urlencoded' \
 --data-urlencode 'name=manager' \
---data-urlencode 'paths=/mgr' \
+--data-urlencode 'paths=/inventory' \
 --data-urlencode 'methods=GET' \
 --data-urlencode 'methods=POST' \
 --data-urlencode 'methods=PUT' \
@@ -44,7 +44,7 @@ curl --location --request POST 'http://localhost:8001/services/inventory-service
 curl --location --request POST 'http://localhost:8001/services/orders-service/routes' \
 --header 'Content-Type: application/x-www-form-urlencoded' \
 --data-urlencode 'name=orders' \
---data-urlencode 'paths=/' \
+--data-urlencode 'paths=/store' \
 --data-urlencode 'methods=GET' \
 --data-urlencode 'methods=POST' \
 --data-urlencode 'methods=PUT' \
