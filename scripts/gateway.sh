@@ -34,7 +34,7 @@ curl --location --request POST 'http://localhost:8001/services/account-service/r
 
 curl --location --request POST 'http://localhost:8001/services/inventory-service/routes' \
 --header 'Content-Type: application/x-www-form-urlencoded' \
---data-urlencode 'name=manager' \
+--data-urlencode 'name=inventory' \
 --data-urlencode 'paths=/inventory' \
 --data-urlencode 'methods=GET' \
 --data-urlencode 'methods=POST' \

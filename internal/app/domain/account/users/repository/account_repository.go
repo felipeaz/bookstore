@@ -5,7 +5,6 @@ import (
 	"bookstore/internal/app/database"
 	"bookstore/internal/app/domain/account/users/model"
 	"bookstore/internal/app/domain/account/users/model/converter"
-	"fmt"
 )
 
 type AccountRepository struct {
@@ -54,7 +53,7 @@ func (r AccountRepository) Find(id string) (model.Account, *errors.ApiError) {
 
 // FindWhere user by field and value.
 func (r AccountRepository) FindWhere(fieldName, fieldValue string) (model.Account, *errors.ApiError) {
-	result, err := r.DB.FetchAllWhere(&model.Account{}, fmt.Sprintf("%s = %s", fieldName, fieldValue))
+	result, err := r.DB.FetchAllWhere(&model.Account{}, fieldName, fieldValue)
 	if err != nil {
 		return model.Account{}, &errors.ApiError{
 			Status:  r.DB.GetErrorStatusCode(err),

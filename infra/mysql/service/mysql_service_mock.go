@@ -33,8 +33,8 @@ func (s *MockMySQLService) FetchWithPreload(domainObj interface{}, id, preload s
 	return resp.Get(0), resp.Get(1).(error)
 }
 
-func (s *MockMySQLService) FetchAllWhere(domainObj interface{}, query string) (interface{}, error) {
-	resp := s.Called(domainObj, query)
+func (s *MockMySQLService) FetchAllWhere(domainObj interface{}, fieldName, fieldValue string) (interface{}, error) {
+	resp := s.Called(domainObj, fieldName, fieldValue)
 	return resp.Get(0), resp.Get(1).(error)
 }
 

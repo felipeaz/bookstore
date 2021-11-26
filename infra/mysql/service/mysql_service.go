@@ -70,8 +70,8 @@ func (s MySQLService) FetchWithPreload(domainObj interface{}, id, preload string
 	return domainObj, nil
 }
 
-func (s MySQLService) FetchAllWhere(domainObj interface{}, query string) (interface{}, error) {
-	result := s.DB.Model(domainObj).Where(query).Find(domainObj)
+func (s MySQLService) FetchAllWhere(domainObj interface{}, fieldName, fieldValue string) (interface{}, error) {
+	result := s.DB.Model(domainObj).Where(fieldName+" = ?", fieldValue).Find(domainObj)
 	if err := result.Error; err != nil {
 		s.Log.Error(err)
 		return nil, err

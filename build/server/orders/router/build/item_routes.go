@@ -6,7 +6,7 @@ import (
 )
 
 func ItemRoutes(rg *gin.RouterGroup, itemHandler handler.ItemHandler) {
-	r := rg.Group("/items")
+	r := rg.Group("/orders")
 	r.GET("/:id/book", itemHandler.Get)
 	r.GET("/:id", itemHandler.Find)
 	r.POST("/", itemHandler.Create)
