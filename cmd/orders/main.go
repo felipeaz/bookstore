@@ -16,11 +16,11 @@ const (
 
 func main() {
 	db, err := database.Connect(
-		os.Getenv("orders_DB_USER"),
-		os.Getenv("orders_DB_PASSWORD"),
-		os.Getenv("orders_DB_HOST"),
-		os.Getenv("orders_DB_PORT"),
-		os.Getenv("orders_DB_DATABASE"),
+		os.Getenv("ORDERS_DB_USER"),
+		os.Getenv("ORDERS_DB_PASSWORD"),
+		os.Getenv("ORDERS_DB_HOST"),
+		os.Getenv("ORDERS_DB_PORT"),
+		os.Getenv("ORDERS_DB_DATABASE"),
 	)
 	if err != nil {
 		log.Fatal(err.Error())

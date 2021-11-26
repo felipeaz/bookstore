@@ -16,7 +16,7 @@ services:
     links:
       - redis
     depends_on:
-      - "account-service-db-host"
+      - "account-db"
       - "redis"
     restart: unless-stopped
     working_dir: "/go/src/bookstore/cmd/account/"
@@ -37,7 +37,7 @@ services:
     networks:
       - kong-net
     ports:
-      - "3308:3307"
+      - "3307:3306"
   inventory-service:
     build:
       context: "./"
@@ -69,7 +69,7 @@ services:
     networks:
       - kong-net
     ports:
-      - "3307:3306"
+      - "3308:3307"
   orders-service:
     build:
       context: "./"
@@ -80,10 +80,10 @@ services:
     links:
       - redis
     depends_on:
-      - "orders-service-db-host"
+      - "orders-db"
       - "redis"
     restart: unless-stopped
-    working_dir: "/go/src/orders/cmd/orders/"
+    working_dir: "/go/src/bookstore/cmd/orders/"
     expose:
       - 8083
     command: bash -c "CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main . && ./main"
@@ -91,9 +91,9 @@ services:
       - kong-net
     ports:
       - "8083:8083"
-  orders-service-db-host:
+  orders-db:
     image: mysql:8.0
-    container_name: orders-service-database
+    container_name: orders-database
     environment:
       MYSQL_DATABASE: Orders
       MYSQL_ROOT_PASSWORD: abc123
@@ -101,7 +101,7 @@ services:
     networks:
       - kong-net
     ports:
-      - "3309:3306"
+      - "3309:3308"
   redis:
     image: redis:alpine
     container_name: redis

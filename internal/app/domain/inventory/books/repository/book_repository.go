@@ -20,7 +20,7 @@ func NewBookRepository(db database.GORMServiceInterface) BookRepository {
 
 // Get returns all books from DB.
 func (r BookRepository) Get() ([]model.Book, *errors.ApiError) {
-	result, err := r.DB.FetchAllWithPreload(&[]model.Book{}, "BookCategory")
+	result, err := r.DB.FetchAll(&[]model.Book{})
 	if err != nil {
 		return nil, &errors.ApiError{
 			Status:  r.DB.GetErrorStatusCode(err),
@@ -33,7 +33,7 @@ func (r BookRepository) Get() ([]model.Book, *errors.ApiError) {
 
 // Find return one book from DB by ID.
 func (r BookRepository) Find(id string) (model.Book, *errors.ApiError) {
-	result, err := r.DB.FetchWithPreload(&model.Book{}, id, "BookCategory")
+	result, err := r.DB.Fetch(&model.Book{}, id)
 	if err != nil {
 		return model.Book{}, &errors.ApiError{
 			Status:  r.DB.GetErrorStatusCode(err),

@@ -23,19 +23,19 @@ curl --location --request POST 'http://localhost:8001/services' \
 
 printf "Creating Routes...\n\n"
 
-curl --location --request POST 'http://localhost:8001/services/inventory-service/routes' \
+curl --location --request POST 'http://localhost:8001/services/account-service/routes' \
 --header 'Content-Type: application/x-www-form-urlencoded' \
---data-urlencode 'name=manager' \
---data-urlencode 'paths=/mgr' \
+--data-urlencode 'name=account' \
+--data-urlencode 'paths=/auth' \
 --data-urlencode 'methods=GET' \
 --data-urlencode 'methods=POST' \
 --data-urlencode 'methods=PUT' \
 --data-urlencode 'methods=DELETE'
 
-curl --location --request POST 'http://localhost:8001/services/account-service/routes' \
+curl --location --request POST 'http://localhost:8001/services/inventory-service/routes' \
 --header 'Content-Type: application/x-www-form-urlencoded' \
---data-urlencode 'name=account' \
---data-urlencode 'paths=/auth' \
+--data-urlencode 'name=manager' \
+--data-urlencode 'paths=/mgr' \
 --data-urlencode 'methods=GET' \
 --data-urlencode 'methods=POST' \
 --data-urlencode 'methods=PUT' \

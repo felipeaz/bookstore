@@ -5,6 +5,7 @@ import (
 	"bookstore/internal/app/database"
 	"bookstore/internal/app/domain/orders/items/model"
 	"bookstore/internal/app/domain/orders/items/model/converter"
+	"fmt"
 )
 
 type ItemRepository struct {
@@ -18,7 +19,7 @@ func NewItemRepository(db database.GORMServiceInterface) ItemRepository {
 }
 
 func (r ItemRepository) Get(bookId string) ([]model.Item, *errors.ApiError) {
-	result, err := r.DB.FetchAllWhere(&[]model.Item{}, "book_id", bookId)
+	result, err := r.DB.FetchAllWhere(&[]model.Item{}, fmt.Sprintf("book_id = %s", bookId))
 	if err != nil {
 		return nil, &errors.ApiError{
 			Status:  r.DB.GetErrorStatusCode(err),
