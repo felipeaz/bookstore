@@ -8,9 +8,9 @@ import (
 // Book contains all Book's table properties.
 type Book struct {
 	ID              uint      `json:"id" gorm:"primaryKey;autoIncrement;not null"`
-	Title           string    `json:"title" binding:"required"`
-	AuthorFirstName string    `json:"authorFirstName" binding:"required"`
-	AuthorLastName  string    `json:"authorLastName" binding:"required"`
+	Title           string    `json:"title"`
+	AuthorFirstName string    `json:"authorFirstName"`
+	AuthorLastName  string    `json:"authorLastName"`
 	Amount          int64     `json:"amount"`
 	CreatedAt       time.Time `time_format:"2006-01-02 15:04:05"`
 	UpdatedAt       time.Time `time_format:"2006-01-02 15:04:05"`
