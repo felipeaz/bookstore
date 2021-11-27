@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package book;
+option go_package = "../internal/app/domain/server";
+
+message Request {
+  string bookId = 1;
+  int64 amount = 2;
+}
+
+message Response {
+  bool success = 1;
+  int32 status = 2;
+}
+
+service OrdersService {
+  rpc ChangeAmount(Request) returns (Response) {}
+}

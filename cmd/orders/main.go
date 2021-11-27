@@ -2,6 +2,7 @@ package main
 
 import (
 	"bookstore/infra/redis"
+	"google.golang.org/grpc"
 	"log"
 	"os"
 
@@ -41,7 +42,19 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	err = server.Start(dbService, cache, logger)
+	grpcConn, err := grpc.Dial(os.Getenv("INVENTORY_GRPC_HOST"), grpc.WithInsecure())
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	defer func(grpcConnection *grpc.ClientConn) {
+		err := grpcConnection.Close()
+		if err != nil {
+
+		}
+	}(grpcConn)
+
+	err = server.Start(dbService, grpcConn, cache, logger)
 	if err != nil {
 		log.Fatal(err.Error())
 	}

@@ -17,8 +17,8 @@ func NewItemRepository(db database.GORMServiceInterface) ItemRepository {
 	}
 }
 
-func (r ItemRepository) Get(bookId string) ([]model.Item, *errors.ApiError) {
-	result, err := r.DB.FetchAllWhere(&[]model.Item{}, "book_id = %s", bookId)
+func (r ItemRepository) Get() ([]model.Item, *errors.ApiError) {
+	result, err := r.DB.FetchAll(&[]model.Item{})
 	if err != nil {
 		return nil, &errors.ApiError{
 			Status:  r.DB.GetErrorStatusCode(err),

@@ -6,7 +6,7 @@ import (
 )
 
 type ItemModuleInterface interface {
-	Get(bookId string) ([]model.Item, *errors.ApiError)
+	Get() ([]model.Item, *errors.ApiError)
 	Find(id string) (model.Item, *errors.ApiError)
 	Create(item model.Item) (uint, *errors.ApiError)
 	Update(id string, upItem model.Item) *errors.ApiError

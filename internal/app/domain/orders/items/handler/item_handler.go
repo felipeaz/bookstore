@@ -19,7 +19,7 @@ func NewItemHandler(module _interface.ItemModuleInterface) ItemHandler {
 }
 
 func (h ItemHandler) Get(c *gin.Context) {
-	items, apiError := h.Module.Get(c.Param("id"))
+	items, apiError := h.Module.Get()
 	if apiError != nil {
 		c.JSON(apiError.Status, apiError)
 		return

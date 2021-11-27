@@ -7,12 +7,17 @@ import (
 	"bookstore/internal/app/domain/orders/items/module"
 	"bookstore/internal/app/domain/orders/items/repository"
 	"bookstore/internal/app/logger"
+	"google.golang.org/grpc"
 )
 
 // Start initialize the webservice,
-func Start(dbService database.GORMServiceInterface, cache database.CacheInterface, log logger.LogInterface) (err error) {
+func Start(
+	dbService database.GORMServiceInterface,
+	grpcConn *grpc.ClientConn,
+	cache database.CacheInterface,
+	log logger.LogInterface) (err error) {
 	cRepository := repository.NewItemRepository(dbService)
-	cModule := module.NewItemModule(cRepository, cache, log)
+	cModule := module.NewItemModule(cRepository, grpcConn, cache, log)
 	cHandler := handler.NewItemHandler(cModule)
 
 	return router.Build(cHandler)
