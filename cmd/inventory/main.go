@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bookstore/build/server/inventory/grpc"
 	"bookstore/infra/redis"
 	"log"
 	"os"
@@ -41,13 +40,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-
-	go func() {
-		err = grpc.Start()
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-	}()
 
 	err = server.Start(dbService, cache, logger)
 	if err != nil {

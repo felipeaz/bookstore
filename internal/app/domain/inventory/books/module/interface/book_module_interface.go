@@ -3,6 +3,8 @@ package _interface
 import (
 	"bookstore/internal/app/constants/errors"
 	"bookstore/internal/app/domain/inventory/books/model"
+	"bookstore/internal/app/domain/server"
+	"context"
 )
 
 type BookModuleInterface interface {
@@ -11,4 +13,5 @@ type BookModuleInterface interface {
 	Create(book model.Book) (uint, *errors.ApiError)
 	Update(id string, upBook model.Book) *errors.ApiError
 	Delete(id string) *errors.ApiError
+	ChangeAmount(ctx context.Context, req *server.Request) (*server.Response, error)
 }
