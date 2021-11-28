@@ -15,6 +15,6 @@ type Item struct {
 	UpdatedAt       time.Time `time_format:"2006-01-02 15:04:05"`
 }
 
-func (i Item) GetConsumerName() string {
+func (i Item) GetClientName() string {
 	return fmt.Sprintf("%s %s", i.ClientFirstName, i.ClientLastName)
 }
