@@ -2,7 +2,12 @@
 This project is a backend API developed using microservice architecture for a book store. Each Service communicates with each other using gRPC protocol, and their endpoints were built with REST and everything is running on a Docker container.
 
 To start the application, run the following command:
+
 ``make install``
+
+Before start using it, open another terminal on the project folder ``/bookstore`` and run the api gateway setup
+
+``make gateway``
 
 # Architecture
 The structure was built using ``Clean Architecture`` - The application is divided in layers which uses adapters to communicate with external/internal layers (ports and adapters).
