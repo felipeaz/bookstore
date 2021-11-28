@@ -49,16 +49,16 @@ func (r ItemRepository) Find(id string) (model.Item, *errors.ApiError) {
 	return item, nil
 }
 
-func (r ItemRepository) Create(item model.Item) (uint, *errors.ApiError) {
+func (r ItemRepository) Create(item model.Item) (model.Item, *errors.ApiError) {
 	err := r.DB.Persist(&item)
 	if err != nil {
-		return 0, &errors.ApiError{
+		return model.Item{}, &errors.ApiError{
 			Status:  r.DB.GetErrorStatusCode(err),
 			Message: errors.CreateFailMessage,
 			Error:   err.Error(),
 		}
 	}
-	return item.ID, nil
+	return item, nil
 }
 
 func (r ItemRepository) Update(id string, upItem model.Item) *errors.ApiError {

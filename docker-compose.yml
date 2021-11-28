@@ -17,7 +17,7 @@ services:
       - redis
     depends_on:
       - "account-db"
-      - "redis"
+      - "account-redis"
     restart: unless-stopped
     working_dir: "/go/src/bookstore/cmd/account/"
     expose:
@@ -38,6 +38,13 @@ services:
       - kong-net
     ports:
       - "3307:3306"
+  account-redis:
+    image: redis:alpine
+    container_name: account-redis
+    networks:
+      - kong-net
+    ports:
+      - "6380:6379"
   inventory-service:
     build:
       context: "./"
@@ -49,7 +56,7 @@ services:
       - redis
     depends_on:
       - "inventory-db"
-      - "redis"
+      - "inventory-redis"
     restart: unless-stopped
     working_dir: "/go/src/bookstore/cmd/inventory/"
     expose:
@@ -70,6 +77,13 @@ services:
       - kong-net
     ports:
       - "3308:3307"
+  inventory-redis:
+    image: redis:alpine
+    container_name: inventory-redis
+    networks:
+      - kong-net
+    ports:
+      - "6381:6379"
   orders-service:
     build:
       context: "./"
@@ -81,7 +95,7 @@ services:
       - redis
     depends_on:
       - "orders-db"
-      - "redis"
+      - "orders-redis"
     restart: unless-stopped
     working_dir: "/go/src/bookstore/cmd/orders/"
     expose:
@@ -102,13 +116,13 @@ services:
       - kong-net
     ports:
       - "3309:3308"
-  redis:
+  orders-redis:
     image: redis:alpine
-    container_name: redis
+    container_name: orders-redis
     networks:
       - kong-net
     ports:
-      - "6380:6379"
+      - "6382:6379"
   kong-database:
     image: postgres:9.6
     restart: always

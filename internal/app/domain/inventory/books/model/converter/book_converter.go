@@ -1,6 +1,7 @@
 package converter
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"bookstore/internal/app/constants/errors"
@@ -30,4 +31,30 @@ func ConvertToSliceBookObj(obj interface{}) ([]model.Book, *errors.ApiError) {
 		}
 	}
 	return *bookObj, nil
+}
+
+func ConvertToBookObjFromCache(b []byte) (model.Book, *errors.ApiError) {
+	var book model.Book
+	err := json.Unmarshal(b, &book)
+	if err != nil {
+		return model.Book{}, &errors.ApiError{
+			Status:  http.StatusBadRequest,
+			Message: errors.FailedToConvertObj,
+			Error:   err.Error(),
+		}
+	}
+	return book, nil
+}
+
+func ConvertToSliceBookObjFromCache(b []byte) ([]model.Book, *errors.ApiError) {
+	var books []model.Book
+	err := json.Unmarshal(b, &books)
+	if err != nil {
+		return nil, &errors.ApiError{
+			Status:  http.StatusBadRequest,
+			Message: errors.FailedToConvertObj,
+			Error:   err.Error(),
+		}
+	}
+	return books, nil
 }

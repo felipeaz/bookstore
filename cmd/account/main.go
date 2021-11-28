@@ -35,9 +35,9 @@ func main() {
 	dbService := service.NewMySQLService(db, logger)
 
 	cache, err := redis.NewCache(
-		os.Getenv("REDIS_HOST"),
-		os.Getenv("REDIS_PORT"),
-		os.Getenv("REDIS_EXPIRE"),
+		os.Getenv("ACCOUNT_REDIS_HOST"),
+		os.Getenv("ACCOUNT_REDIS_PORT"),
+		os.Getenv("ACCOUNT_REDIS_EXPIRE"),
 		logger,
 	)
 	if err != nil {

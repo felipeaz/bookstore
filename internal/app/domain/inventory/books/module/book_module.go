@@ -4,12 +4,15 @@ import (
 	"bookstore/internal/app/constants/errors"
 	"bookstore/internal/app/database"
 	"bookstore/internal/app/domain/inventory/books/model"
+	"bookstore/internal/app/domain/inventory/books/model/converter"
 	"bookstore/internal/app/domain/inventory/books/repository/interface"
 	"bookstore/internal/app/domain/server"
 	"bookstore/internal/app/logger"
 	"context"
-	_errors "errors"
+	"encoding/json"
+	_errors "github.com/pkg/errors"
 	"net/http"
+	"strconv"
 )
 
 // BookModule process the request received from handler.
@@ -30,29 +33,92 @@ func NewBookModule(
 	}
 }
 
-// Get returns all books on DB.
+const (
+	AllData = "books"
+)
+
 func (m BookModule) Get() ([]model.Book, *errors.ApiError) {
+	b, err := m.Cache.Get(AllData)
+	if err != nil {
+		m.Log.Error(err)
+	}
+	if b != nil {
+		return converter.ConvertToSliceBookObjFromCache(b)
+	}
+
+	books, apiError := m.Repository.Get()
+	if apiError != nil {
+		return nil, apiError
+	}
+	m.setAllBookCache(books)
 	return m.Repository.Get()
 }
 
-// Find returns all books on DB.
 func (m BookModule) Find(id string) (model.Book, *errors.ApiError) {
-	return m.Repository.Find(id)
+	b, err := m.Cache.Get(id)
+	if err != nil {
+		m.Log.Error(err)
+	}
+	if b != nil {
+		return converter.ConvertToBookObjFromCache(b)
+	}
+
+	book, apiError := m.Repository.Find(id)
+	if apiError != nil {
+		return model.Book{}, apiError
+	}
+	m.setBookCache(book)
+	return book, nil
 }
 
-// Create persist a book to the database.
-func (m BookModule) Create(book model.Book) (uint, *errors.ApiError) {
-	return m.Repository.Create(book)
+func (m BookModule) Create(book model.Book) (model.Book, *errors.ApiError) {
+	book, apiError := m.Repository.Create(book)
+	if apiError != nil {
+		return model.Book{}, apiError
+	}
+
+	err := m.Cache.Flush(AllData)
+	if err != nil {
+		m.Log.Error(err)
+	}
+	m.setBookCache(book)
+	return book, nil
 }
 
-// Update update an existent book.
 func (m BookModule) Update(id string, upBook model.Book) *errors.ApiError {
-	return m.Repository.Update(id, upBook)
+	apiError := m.Repository.Update(id, upBook)
+	if apiError != nil {
+		return apiError
+	}
+
+	err := m.Cache.Flush(id)
+	if err != nil {
+		m.Log.Error(err)
+	}
+	err = m.Cache.Flush(AllData)
+	if err != nil {
+		err = _errors.Wrap(err, errors.FailedToFlushAllCache)
+		m.Log.Error(err)
+	}
+	return nil
 }
 
-// Delete delete an existent book.
 func (m BookModule) Delete(id string) *errors.ApiError {
-	return m.Repository.Delete(id)
+	apiError := m.Repository.Delete(id)
+	if apiError != nil {
+		return apiError
+	}
+
+	err := m.Cache.Flush(id)
+	if err != nil {
+		m.Log.Error(err)
+	}
+	err = m.Cache.Flush(AllData)
+	if err != nil {
+		err = _errors.Wrap(err, errors.FailedToFlushAllCache)
+		m.Log.Error(err)
+	}
+	return nil
 }
 
 // ChangeAmount receives an order and reduce the amount on inventory
@@ -90,4 +156,26 @@ func (m BookModule) ChangeAmount(ctx context.Context, req *server.Request) (*ser
 	}
 
 	return &server.Response{Success: true}, nil
+}
+
+func (m BookModule) setBookCache(book model.Book) {
+	b, err := json.Marshal(book)
+	if err != nil {
+		m.Log.Error(err)
+	}
+	err = m.Cache.Set(strconv.FormatUint(uint64(book.ID), 10), b)
+	if err != nil {
+		err = _errors.Wrap(err, errors.FailedToSetCache)
+	}
+}
+
+func (m BookModule) setAllBookCache(books []model.Book) {
+	b, err := json.Marshal(books)
+	if err != nil {
+		m.Log.Error(err)
+	}
+	err = m.Cache.Set(AllData, b)
+	if err != nil {
+		err = _errors.Wrap(err, errors.FailedToSetCache)
+	}
 }

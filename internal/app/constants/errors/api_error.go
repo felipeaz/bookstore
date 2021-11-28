@@ -19,6 +19,8 @@ const (
 	FailedToDeleteConsumer                = "Failed to delete consumer"
 	FailedToRetrieveConsumerKey           = "Failed to retrieve consumer"
 	FailedToUpdateInventoryAmount         = "Failed to update inventory amount"
+	FailedToFlushAllCache                 = "Failed to flush all cache"
+	FailedToSetCache                      = "Failed to set cache"
 )
 
 // ApiError will be used on API Errors
