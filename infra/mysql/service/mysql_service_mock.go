@@ -44,7 +44,7 @@ func (s *MockMySQLService) Persist(domainObj interface{}) error {
 }
 
 func (s *MockMySQLService) Refresh(domainObj interface{}, id string) error {
-	resp := s.Called(domainObj, id)
+	resp := s.Called(id)
 	return resp.Error(0)
 }
 

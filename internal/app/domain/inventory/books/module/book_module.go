@@ -3,6 +3,7 @@ package module
 import (
 	"bookstore/internal/app/constants/errors"
 	"bookstore/internal/app/database"
+	"bookstore/internal/app/domain/inventory/books/constants"
 	"bookstore/internal/app/domain/inventory/books/model"
 	"bookstore/internal/app/domain/inventory/books/model/converter"
 	"bookstore/internal/app/domain/inventory/books/repository/interface"
@@ -135,7 +136,7 @@ func (m BookModule) ChangeAmount(ctx context.Context, req *server.Request) (*ser
 		return &server.Response{
 			Success: false,
 			Status:  http.StatusBadRequest,
-		}, _errors.New("item is out of stock")
+		}, _errors.New(constants.ItemOutOfStockError)
 	}
 
 	updateAmount := upBook.Amount - req.Amount
@@ -143,7 +144,7 @@ func (m BookModule) ChangeAmount(ctx context.Context, req *server.Request) (*ser
 		return &server.Response{
 			Success: false,
 			Status:  http.StatusBadRequest,
-		}, _errors.New("amount requested is greater than available stock")
+		}, _errors.New(constants.AmountGreaterThanStockError)
 	}
 	upBook.Amount = updateAmount
 
