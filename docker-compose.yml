@@ -123,6 +123,18 @@ services:
       - kong-net
     ports:
       - "6382:6379"
+  message-broker:
+    image: rabbitmq:3-management-alpine
+    container_name: message-broker
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - ${HOME}/dev-rabbitmq/data/:/var/lib/rabbitmq
+      - ${HOME}/dev-rabbitmq/log/:/var/log/rabbitmq
+    restart: always
+    networks:
+      - kong-net
   kong-database:
     image: postgres:9.6
     restart: always

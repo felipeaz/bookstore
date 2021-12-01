@@ -1,6 +1,7 @@
 package module
 
 import (
+	"bookstore/build/server/amqp/sender"
 	"bookstore/internal/app/constants/errors"
 	"bookstore/internal/app/database"
 	"bookstore/internal/app/domain/orders/items/model"
@@ -25,6 +26,7 @@ type ItemModule struct {
 
 func NewItemModule(
 	repo _interface.ItemRepositoryInterface,
+	queue *sender.RabbitMQ,
 	grpcConn *grpc.ClientConn,
 	cache database.CacheInterface,
 	log logger.LogInterface) ItemModule {

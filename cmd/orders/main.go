@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bookstore/build/server/amqp/sender"
 	"bookstore/infra/redis"
 	"google.golang.org/grpc"
 	"log"
@@ -47,14 +48,14 @@ func main() {
 		log.Fatal(err)
 		return
 	}
-	defer func(grpcConnection *grpc.ClientConn) {
-		err := grpcConnection.Close()
-		if err != nil {
+	defer grpcConn.Close()
 
-		}
-	}(grpcConn)
+	queue, err := sender.CreateAMQP(os.Getenv("AMQP_SERVER_URL"), os.Getenv("AMQP_QUEUE_NAME"))
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	err = server.Start(dbService, grpcConn, cache, logger)
+	err = server.Start(dbService, queue, grpcConn, cache, logger)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
