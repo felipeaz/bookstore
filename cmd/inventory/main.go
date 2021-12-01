@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	ServiceName = "inventory Service"
+	ServiceName = "Inventory Service"
 )
 
 func main() {

@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	ServiceName = "orders Service"
+	ServiceName = "Orders Service"
 )
 
 func main() {

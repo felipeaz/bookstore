@@ -96,6 +96,7 @@ services:
     depends_on:
       - "orders-db"
       - "orders-redis"
+      - "message-broker"
     restart: unless-stopped
     working_dir: "/go/src/bookstore/cmd/orders/"
     expose:
@@ -123,6 +124,21 @@ services:
       - kong-net
     ports:
       - "6382:6379"
+  shipping-service:
+    build:
+      context: "./"
+      dockerfile: "build/docker/images/go/Dockerfile"
+    container_name: shipping-service
+    env_file:
+      - .env
+    depends_on:
+      - "orders-service"
+      - "message-broker"
+    restart: unless-stopped
+    working_dir: "/go/src/bookstore/cmd/shipping/"
+    expose:
+      - 8084
+    command: bash -c "CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main . && ./main"
   message-broker:
     image: rabbitmq:3-management-alpine
     container_name: message-broker
