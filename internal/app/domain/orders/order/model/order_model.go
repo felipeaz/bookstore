@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type Item struct {
+type Order struct {
 	ID              uint      `json:"id" gorm:"primaryKey;autoIncrement;not null"`
 	BookId          uint      `json:"bookId" binding:"required"`
 	ClientFirstName string    `json:"clientFirstName" binding:"required"`
@@ -15,6 +15,6 @@ type Item struct {
 	UpdatedAt       time.Time `time_format:"2006-01-02 15:04:05"`
 }
 
-func (i Item) GetClientName() string {
-	return fmt.Sprintf("%s %s", i.ClientFirstName, i.ClientLastName)
+func (o Order) GetClientName() string {
+	return fmt.Sprintf("%s %s", o.ClientFirstName, o.ClientLastName)
 }

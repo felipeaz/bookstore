@@ -4,9 +4,9 @@ import (
 	"bookstore/build/server/amqp/sender"
 	"bookstore/build/server/orders/router"
 	"bookstore/internal/app/database"
-	"bookstore/internal/app/domain/orders/items/handler"
-	"bookstore/internal/app/domain/orders/items/module"
-	"bookstore/internal/app/domain/orders/items/repository"
+	"bookstore/internal/app/domain/orders/order/handler"
+	"bookstore/internal/app/domain/orders/order/module"
+	"bookstore/internal/app/domain/orders/order/repository"
 	"bookstore/internal/app/logger"
 	"google.golang.org/grpc"
 )
@@ -18,9 +18,9 @@ func Start(
 	grpcConn *grpc.ClientConn,
 	cache database.CacheInterface,
 	log logger.LogInterface) (err error) {
-	cRepository := repository.NewItemRepository(dbService)
-	cModule := module.NewItemModule(cRepository, queue, grpcConn, cache, log)
-	cHandler := handler.NewItemHandler(cModule)
+	cRepository := repository.NewOrderRepository(dbService)
+	cModule := module.NewOrderModule(cRepository, queue, grpcConn, cache, log)
+	cHandler := handler.NewOrderHandler(cModule)
 
 	return router.Build(cHandler)
 }

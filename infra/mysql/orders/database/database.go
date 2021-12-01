@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"bookstore/internal/app/domain/orders/items/model"
+	"bookstore/internal/app/domain/orders/order/model"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -48,6 +48,6 @@ func CloseConnection(db *gorm.DB) {
 // and if the properties aren't set, updates them just like the struct definition.
 func (db *DBHandler) autoMigrateTables() error {
 	return db.conn.Migrator().AutoMigrate(
-		&model.Item{},
+		&model.Order{},
 	)
 }

@@ -136,7 +136,7 @@ func (m BookModule) ChangeAmount(ctx context.Context, req *server.Request) (*ser
 		return &server.Response{
 			Success: false,
 			Status:  http.StatusBadRequest,
-		}, _errors.New(constants.ItemOutOfStockError)
+		}, _errors.New(constants.OrderOutOfStockError)
 	}
 
 	updateAmount := upBook.Amount - req.Amount

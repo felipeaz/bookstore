@@ -4,9 +4,9 @@ import (
 	"bookstore/build/server/amqp/sender"
 	"bookstore/internal/app/constants/errors"
 	"bookstore/internal/app/database"
-	"bookstore/internal/app/domain/orders/items/model"
-	"bookstore/internal/app/domain/orders/items/model/converter"
-	"bookstore/internal/app/domain/orders/items/repository/interface"
+	"bookstore/internal/app/domain/orders/order/model"
+	"bookstore/internal/app/domain/orders/order/model/converter"
+	"bookstore/internal/app/domain/orders/order/repository/interface"
 	"bookstore/internal/app/domain/server"
 	"bookstore/internal/app/logger"
 	"context"
@@ -17,20 +17,20 @@ import (
 	"strconv"
 )
 
-type ItemModule struct {
-	Repository _interface.ItemRepositoryInterface
+type OrderModule struct {
+	Repository _interface.OrderRepositoryInterface
 	Cache      database.CacheInterface
 	GRPCConn   *grpc.ClientConn
 	Log        logger.LogInterface
 }
 
-func NewItemModule(
-	repo _interface.ItemRepositoryInterface,
+func NewOrderModule(
+	repo _interface.OrderRepositoryInterface,
 	queue *sender.RabbitMQ,
 	grpcConn *grpc.ClientConn,
 	cache database.CacheInterface,
-	log logger.LogInterface) ItemModule {
-	return ItemModule{
+	log logger.LogInterface) OrderModule {
+	return OrderModule{
 		Repository: repo,
 		Cache:      cache,
 		GRPCConn:   grpcConn,
@@ -39,55 +39,55 @@ func NewItemModule(
 }
 
 const (
-	AllData = "items"
+	AllData = "orders"
 )
 
-func (m ItemModule) Get() ([]model.Item, *errors.ApiError) {
+func (m OrderModule) Get() ([]model.Order, *errors.ApiError) {
 	b, err := m.Cache.Get(AllData)
 	if err != nil {
 		m.Log.Error(err)
 	}
 	if b != nil {
-		return converter.ConvertToSliceItemObjFromCache(b)
+		return converter.ConvertToSliceOrderObjFromCache(b)
 	}
 
-	item, apiError := m.Repository.Get()
+	order, apiError := m.Repository.Get()
 	if apiError != nil {
 		return nil, apiError
 	}
 
-	m.setAllItemsCache(item)
-	return item, nil
+	m.setAllOrdersCache(order)
+	return order, nil
 }
 
-func (m ItemModule) Find(id string) (model.Item, *errors.ApiError) {
+func (m OrderModule) Find(id string) (model.Order, *errors.ApiError) {
 	b, err := m.Cache.Get(id)
 	if err != nil {
 		m.Log.Error(err)
 	}
 	if b != nil {
-		return converter.ConvertToItemObjFromCache(b)
+		return converter.ConvertToOrderObjFromCache(b)
 	}
 
-	item, apiError := m.Repository.Find(id)
+	order, apiError := m.Repository.Find(id)
 	if apiError != nil {
-		return model.Item{}, apiError
+		return model.Order{}, apiError
 	}
 
-	m.setItemCache(item)
-	return item, nil
+	m.setOrderCache(order)
+	return order, nil
 }
 
-func (m ItemModule) Create(item model.Item) (model.Item, *errors.ApiError) {
+func (m OrderModule) Create(order model.Order) (model.Order, *errors.ApiError) {
 	client := server.NewOrdersServiceClient(m.GRPCConn)
 	req := &server.Request{
-		BookId: strconv.FormatUint(uint64(item.BookId), 10),
-		Amount: int64(item.Amount),
+		BookId: strconv.FormatUint(uint64(order.BookId), 10),
+		Amount: int64(order.Amount),
 	}
 
 	resp, err := client.ChangeAmount(context.Background(), req)
 	if err != nil {
-		return model.Item{}, &errors.ApiError{
+		return model.Order{}, &errors.ApiError{
 			Status:  http.StatusInternalServerError,
 			Message: errors.FailedToUpdateInventoryAmount,
 			Error:   err.Error(),
@@ -95,7 +95,7 @@ func (m ItemModule) Create(item model.Item) (model.Item, *errors.ApiError) {
 	}
 
 	if !resp.Success {
-		return model.Item{}, &errors.ApiError{
+		return model.Order{}, &errors.ApiError{
 			Status:  int(resp.Status),
 			Message: errors.FailedToUpdateInventoryAmount,
 			Error:   err.Error(),
@@ -107,16 +107,16 @@ func (m ItemModule) Create(item model.Item) (model.Item, *errors.ApiError) {
 		m.Log.Error(err)
 	}
 
-	item, apiError := m.Repository.Create(item)
+	order, apiError := m.Repository.Create(order)
 	if apiError != nil {
-		return model.Item{}, apiError
+		return model.Order{}, apiError
 	}
-	m.setItemCache(item)
-	return item, nil
+	m.setOrderCache(order)
+	return order, nil
 }
 
-func (m ItemModule) Update(id string, upItem model.Item) *errors.ApiError {
-	apiError := m.Repository.Update(id, upItem)
+func (m OrderModule) Update(id string, upOrder model.Order) *errors.ApiError {
+	apiError := m.Repository.Update(id, upOrder)
 	if apiError != nil {
 		return apiError
 	}
@@ -133,7 +133,7 @@ func (m ItemModule) Update(id string, upItem model.Item) *errors.ApiError {
 	return nil
 }
 
-func (m ItemModule) Delete(id string) *errors.ApiError {
+func (m OrderModule) Delete(id string) *errors.ApiError {
 	apiError := m.Repository.Delete(id)
 	if apiError != nil {
 		return apiError
@@ -151,19 +151,19 @@ func (m ItemModule) Delete(id string) *errors.ApiError {
 	return nil
 }
 
-func (m ItemModule) setItemCache(item model.Item) {
-	b, err := json.Marshal(item)
+func (m OrderModule) setOrderCache(order model.Order) {
+	b, err := json.Marshal(order)
 	if err != nil {
 		m.Log.Error(err)
 	}
-	err = m.Cache.Set(strconv.FormatUint(uint64(item.ID), 10), b)
+	err = m.Cache.Set(strconv.FormatUint(uint64(order.ID), 10), b)
 	if err != nil {
 		err = _errors.Wrap(err, errors.FailedToSetCache)
 	}
 }
 
-func (m ItemModule) setAllItemsCache(items []model.Item) {
-	b, err := json.Marshal(items)
+func (m OrderModule) setAllOrdersCache(orders []model.Order) {
+	b, err := json.Marshal(orders)
 	if err != nil {
 		m.Log.Error(err)
 	}

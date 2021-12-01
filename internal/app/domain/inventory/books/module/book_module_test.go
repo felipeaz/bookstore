@@ -94,7 +94,7 @@ func TestChangeAmountRequestedGreaterThanStock(t *testing.T) {
 	assert.Equal(t, resp.Success, false)
 }
 
-func TestChangeAmountItemOutOfStock(t *testing.T) {
+func TestChangeAmountOrderOutOfStock(t *testing.T) {
 	dbMock := new(mysql.MockMySQLService)
 	cacheMock := new(redis.MockCache)
 	logMock := new(logger.Mock)
@@ -130,6 +130,6 @@ func TestChangeAmountItemOutOfStock(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.NotNil(t, resp)
 	assert.Equal(t, resp.Status, int32(http.StatusBadRequest))
-	assert.Equal(t, err.Error(), constants.ItemOutOfStockError)
+	assert.Equal(t, err.Error(), constants.OrderOutOfStockError)
 	assert.Equal(t, resp.Success, false)
 }

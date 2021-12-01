@@ -1,15 +1,15 @@
 package build
 
 import (
-	"bookstore/internal/app/domain/orders/items/handler"
+	"bookstore/internal/app/domain/orders/order/handler"
 	"github.com/gin-gonic/gin"
 )
 
-func ItemRoutes(rg *gin.RouterGroup, itemHandler handler.ItemHandler) {
+func OrderRoutes(rg *gin.RouterGroup, orderHandler handler.OrderHandler) {
 	r := rg.Group("/orders")
-	r.GET("/", itemHandler.Get)
-	r.GET("/:id", itemHandler.Find)
-	r.POST("/", itemHandler.Create)
-	r.PUT("/:id", itemHandler.Update)
-	r.DELETE("/:id", itemHandler.Delete)
+	r.GET("/", orderHandler.Get)
+	r.GET("/:id", orderHandler.Find)
+	r.POST("/", orderHandler.Create)
+	r.PUT("/:id", orderHandler.Update)
+	r.DELETE("/:id", orderHandler.Delete)
 }
