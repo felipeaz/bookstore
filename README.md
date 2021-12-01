@@ -95,6 +95,16 @@ The application domain layer knows only the interface of infra tools, those are 
 # Services
 Each service has its own database & cache. They're also linked to an Api Gateway (Kong) which is also responsible for the service discovery and authentication
 
+## Documentation
+### Account Service
+https://documenter.getpostman.com/view/7958753/UVJeFbyS
+
+### Inventory
+https://documenter.getpostman.com/view/7958753/UVJeFbu9
+
+### Orders
+https://documenter.getpostman.com/view/7958753/UVJeFbyU
+
 ## gRPC
 This protocol is being used to communicate between the microservices
 #### Generate proto file
