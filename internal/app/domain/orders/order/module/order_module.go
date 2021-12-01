@@ -19,6 +19,7 @@ import (
 
 type OrderModule struct {
 	Repository _interface.OrderRepositoryInterface
+	Queue      *sender.RabbitMQ
 	Cache      database.CacheInterface
 	GRPCConn   *grpc.ClientConn
 	Log        logger.LogInterface
@@ -33,6 +34,7 @@ func NewOrderModule(
 	return OrderModule{
 		Repository: repo,
 		Cache:      cache,
+		Queue:      queue,
 		GRPCConn:   grpcConn,
 		Log:        log,
 	}
@@ -78,40 +80,24 @@ func (m OrderModule) Find(id string) (model.Order, *errors.ApiError) {
 	return order, nil
 }
 
-func (m OrderModule) Create(order model.Order) (model.Order, *errors.ApiError) {
-	client := server.NewOrdersServiceClient(m.GRPCConn)
-	req := &server.Request{
-		BookId: strconv.FormatUint(uint64(order.BookId), 10),
-		Amount: int64(order.Amount),
-	}
-
-	resp, err := client.ChangeAmount(context.Background(), req)
-	if err != nil {
-		return model.Order{}, &errors.ApiError{
-			Status:  http.StatusInternalServerError,
-			Message: errors.FailedToUpdateInventoryAmount,
-			Error:   err.Error(),
-		}
-	}
-
-	if !resp.Success {
-		return model.Order{}, &errors.ApiError{
-			Status:  int(resp.Status),
-			Message: errors.FailedToUpdateInventoryAmount,
-			Error:   err.Error(),
-		}
-	}
-
-	err = m.Cache.Flush(AllData)
-	if err != nil {
-		m.Log.Error(err)
-	}
-
-	order, apiError := m.Repository.Create(order)
+func (m OrderModule) Create(orderObj model.Order) (model.Order, *errors.ApiError) {
+	apiError := m.updateInventory(orderObj)
 	if apiError != nil {
 		return model.Order{}, apiError
 	}
+
+	order, apiError := m.Repository.Create(orderObj)
+	if apiError != nil {
+		return model.Order{}, apiError
+	}
+
 	m.setOrderCache(order)
+
+	apiError = m.pushOrderToShippingQueue(order)
+	if apiError != nil {
+		return model.Order{}, apiError
+	}
+
 	return order, nil
 }
 
@@ -171,4 +157,57 @@ func (m OrderModule) setAllOrdersCache(orders []model.Order) {
 	if err != nil {
 		err = _errors.Wrap(err, errors.FailedToSetCache)
 	}
+}
+
+func (m OrderModule) updateInventory(order model.Order) *errors.ApiError {
+	client := server.NewOrdersServiceClient(m.GRPCConn)
+	req := &server.Request{
+		BookId: strconv.FormatUint(uint64(order.BookId), 10),
+		Amount: int64(order.Amount),
+	}
+
+	resp, err := client.ChangeAmount(context.Background(), req)
+	if err != nil {
+		return &errors.ApiError{
+			Status:  http.StatusInternalServerError,
+			Message: errors.FailedToUpdateInventoryAmount,
+			Error:   err.Error(),
+		}
+	}
+
+	if !resp.Success {
+		return &errors.ApiError{
+			Status:  int(resp.Status),
+			Message: errors.FailedToUpdateInventoryAmount,
+			Error:   err.Error(),
+		}
+	}
+
+	err = m.Cache.Flush(AllData)
+	if err != nil {
+		m.Log.Error(err)
+	}
+	return nil
+}
+
+func (m OrderModule) pushOrderToShippingQueue(order model.Order) *errors.ApiError {
+	b, err := json.Marshal(order)
+	if err != nil {
+		return &errors.ApiError{
+			Status:  http.StatusInternalServerError,
+			Message: errors.FailedToUnmarshalObj,
+			Error:   err.Error(),
+		}
+	}
+
+	err = m.Queue.PushMessage(b)
+	if err != nil {
+		return &errors.ApiError{
+			Status:  http.StatusInternalServerError,
+			Message: errors.FailedToPushOrderToQueue,
+			Error:   err.Error(),
+		}
+	}
+
+	return nil
 }

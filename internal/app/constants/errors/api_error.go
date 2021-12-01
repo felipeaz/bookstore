@@ -21,6 +21,8 @@ const (
 	FailedToUpdateInventoryAmount         = "Failed to update inventory amount"
 	FailedToFlushAllCache                 = "Failed to flush all cache"
 	FailedToSetCache                      = "Failed to set cache"
+	FailedToUnmarshalObj                  = "Failed to unmarshal object"
+	FailedToPushOrderToQueue              = "Failed to push order to queue"
 )
 
 // ApiError will be used on API Errors

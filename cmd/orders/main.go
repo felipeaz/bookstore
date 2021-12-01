@@ -50,10 +50,13 @@ func main() {
 	}
 	defer grpcConn.Close()
 
-	queue, err := sender.CreateAMQP(os.Getenv("AMQP_SERVER_URL"), os.Getenv("AMQP_QUEUE_NAME"))
+	queue, err := sender.CreateAMQP(os.Getenv("AMQP_SERVER_URL"), os.Getenv("AMQP_QUEUE_NAME"), logger)
 	if err != nil {
 		log.Fatal(err)
+		return
 	}
+	defer queue.QueueConn.Close()
+	defer queue.QueueChannel.Close()
 
 	err = server.Start(dbService, queue, grpcConn, cache, logger)
 	if err != nil {
